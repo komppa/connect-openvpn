@@ -8,11 +8,11 @@ import time
 config = configparser.ConfigParser()
 
 ping_servers = [
-    "elisa.fi",
-    "telia.fi",
-    "google.com",
-    "apple.com"
-]
+    "1.1.1.1",
+    "8.8.8.8",
+    "8.8.4.4",
+    "208.67.222.222" # OpenDNS
+] 
 
 
 def interface_exists(interface_name):
@@ -44,12 +44,11 @@ def kill_openvpn_client():
 
 def ping(address):
     proc = subprocess.Popen(
-        ["ping", "-c", "1", "-W", "1", str(address)], stdout=subprocess.PIPE
+        ["nc", "-v", "-w", "2", "-z", str(address), "53"], stdout=subprocess.PIPE
     )
     output = str(proc.communicate())
     if (
-        "1 packets transmitted" in output and
-        "1 received" in output
+        "succeeded" in output
     ):
         return True
     return False
