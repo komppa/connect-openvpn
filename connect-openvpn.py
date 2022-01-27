@@ -3,6 +3,7 @@ import subprocess
 import netifaces
 import configparser
 import time
+import socket
 
 
 config = configparser.ConfigParser()
@@ -43,15 +44,14 @@ def kill_openvpn_client():
 
 
 def ping(address):
-    proc = subprocess.Popen(
-        ["nc", "-v", "-w", "2", "-z", str(address), "53"], stdout=subprocess.PIPE
-    )
-    output = str(proc.communicate())
-    if (
-        "succeeded" in output
-    ):
+    try:
+        socket.setdefaulttimeout(int(config['general']['SOCKET_TIMEOUT']))
+        socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM
+        ).connect((address, 53))
         return True
-    return False
+    except Exception as e:
+        return False
 
 def is_network_up():
     # If the fist server says that the connection is up, we can assume that 
@@ -76,7 +76,7 @@ def is_connection_stable():
 
     if up_status:
         # If network is up wait for CONNECTION_STABLE_TIME
-        time.sleep(config["general"]["CONNECTION_STABLE_TIME"])
+        time.sleep(int(config["general"]["CONNECTION_STABLE_TIME"]))
 
         # Check if network is up again
         up_status = is_network_up()
