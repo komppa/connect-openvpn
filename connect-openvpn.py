@@ -129,7 +129,7 @@ def main():
         logger.addHandler(logger_h)
 
     except Exception as e:
-        logger.error("Could not read config.ini file")
+        logger.exception("Could not read config.ini file")
         raise
 
     while True:
