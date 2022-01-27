@@ -10,6 +10,6 @@ The Connect OpenVPN is a script that automatically reconnects your OpenVPN clien
 
 Configure your settings in config.ini and then launch your script with Python:
 
-```jsx
+```bash
 python connect-openvpn.py
 ```
