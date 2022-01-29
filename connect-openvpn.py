@@ -100,22 +100,34 @@ def is_connection_stable():
         logger.info("Network was up, waiting '{}'s".format(
             config["general"]["CONNECTION_STABLE_TIME"]
         ))
-        time.sleep(config["general"]["CONNECTION_STABLE_TIME"])
 
-        # Check if network is up again
-        logger.info("Waiting finished. Checking whether the connection is still up")
-        up_status = is_network_up()
+        # Do not just wait CONNECTION_STABLE_TIME and check the connection,
+        # do the cheking in smaller time interval continuously
+        polling_interval = 10
+
+        if config["general"]["CONNECTION_STABLE_TIME"] < 60:
+            polling_interval = 5
+
+        for i in range(0, config["general"]["CONNECTION_STABLE_TIME"] / polling_interval):
+            if not is_network_up():
+                logger.info("In polling for stable connection, connection went down at some point")
+                up_status = False
+                break
+            else:
+                time.sleep(polling_interval)
+                up_status = True
 
         if up_status:
             # We have stable connection
-            logger.info("Connection was ok, so we have stable connection")
+            logger.info("Connection was ok whole time, so we have stable connection")
             return True
         else:
             # No stable connection
-            logger.info("Could not establish connection. No stable connection")
+            logger.info("No stable connection")
             return False
     else:
         # No stable connection
+        logger.info("The first time when cheking is network up, it failed")
         return False
 
 def main():
