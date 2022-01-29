@@ -46,13 +46,14 @@ def is_openvpn_running():
 def connect_openvpn(certificate="certificate.ovpn"):
     logger.info("Connecting to the OpenVPN server using certificte '{}'".format(certificate))
     # Start OpenVPN client, using the ovpn profile. Send output to null and run in background.
-    os.system("sudo openvpn --config " + str(certificate) + " > /dev/null &")
-    # TODO get status from os.system and log it as well 
+    status = os.system("sudo openvpn --config " + str(certificate) + " > /dev/null &")
+    logger.debug("Status of the OpenVPN client execution: {}".format(str(status)))
 
 
 def kill_openvpn_client():
     logger.info("Killing OpenVPN client")
-    os.system("sudo pkill -9 openvpn")
+    status = os.system("sudo pkill -9 openvpn")
+    logger.debug("Status of the OpenVPN client kill: {}".format(str(status)))
 
 
 def ping(address):
